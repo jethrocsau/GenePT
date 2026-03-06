@@ -27,7 +27,7 @@ These data are deposited at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.
 We provide example notebooks to run the following analyses:
 1. Gene-level prediction tasks
 2. Gene-gene interaction analysis analysis
-3. Cell-level biological data annotation 
+3. Cell-level biological data annotation
 4. Batch effect removal (Cardiomyocyte dataset; Aorta dataset)
 
 Please file an [issue](https://github.com/yiqunchen/GenePT/issues) if you have a request for a tutorial that is not currently included.
@@ -41,10 +41,38 @@ Chen YT,  Zou J. (2023+) GenePT: A Simple But Effective Foundation Model for Gen
 
 ### Breakdown of analysis files:
 1. [request_ncbi_text_for_genes.ipynb](./request_ncbi_text_for_genes.ipynb) provides example code to download NCBI gene summary page.
-2. [gene_embeddings_examples.ipynb](./gene_embeddings_examples.ipynb) provides example code to embed the extracted descriptions in 1 using GPT-3.5 embeddings. Note that this requires a valid registration of the OpenAI API (see instructions and pricing details at https://openai.com/blog/openai-api). 
+2. [gene_embeddings_examples.ipynb](./gene_embeddings_examples.ipynb) provides example code to embed the extracted descriptions in 1 using GPT-3.5 embeddings. Note that this requires a valid registration of the OpenAI API (see instructions and pricing details at https://openai.com/blog/openai-api).
 3. [gene_level_task_table_1.ipynb](./gene_level_task_table_1.ipynb) reproduces the gene level tasks for GenePT embeddings in Table 1 of the paper.
 4. [gene_level_task_figure_2.ipynb](./gene_level_task_figure_2.ipynb) provides the necessary data and output for the gene level tasks described in Figure 2 of our paper.
-5. [aorta_data_analysis.ipynb](./aorta_data_analysis.ipynb) provides example code to create your foundation-model cell embeddings in <20 lines of code and demonstrates the batch effect removal + biology preservation (Figure 4 results of the paper). 
+5. [aorta_data_analysis.ipynb](./aorta_data_analysis.ipynb) provides example code to create your foundation-model cell embeddings in <20 lines of code and demonstrates the batch effect removal + biology preservation (Figure 4 results of the paper).
+
+### Utilities
+
+#### Export dual-embedding CSVs into per-embedding dictionaries
+
+If you have a dual-embedding CSV where vector columns are stored as strings (e.g. `"[0.1, 0.2, ...]"`), you can export each embedding type into a pickle dictionary `{gene_name: np.ndarray}`.
+
+This is useful for downstream evaluation scripts that expect a simple lookup table.
+
+- Script: [`code/process_dual_embeddings.py`](./code/process_dual_embeddings.py)
+- It will create the output folder if it doesn’t exist.
+
+Example (exports `mean_evo2`, `genept` (if present), `evo2_proj`, `genept_proj`):
+
+```bash
+python code/process_dual_embeddings.py \
+	--input /path/to/your/dual_embeddings.csv \
+	--out-dir data/output/dual_embeddings/dual_embeddings
+```
+
+Optional: export a derived concatenation (matches the notebook pattern):
+
+```bash
+python code/process_dual_embeddings.py \
+	--input /path/to/your/dual_embeddings.csv \
+	--out-dir data/output/dual_embeddings/dual_embeddings \
+	--concat evo2_proj+genept_proj:concat_evo2_genept
+```
 
 ### Datasets used in GenePT
 1. For the gene-level tasks, we make use of the following datasets:
@@ -55,7 +83,7 @@ Chen YT,  Zou J. (2023+) GenePT: A Simple But Effective Foundation Model for Gen
 		- Multiple Sclerosis (M.S.) dataset: [link](https://drive.google.com/drive/folders/1Qd42YNabzyr2pWt9xoY4cVMTAxsNBt4v?usp=sharing).
 		- Myeloid (Mye.) dataset: [link](https://drive.google.com/drive/folders/1VbpApQufZq8efFGakW3y8QDDpY9MBoDS?usp=drive_link).
 		- hPancreas dataset: [link](https://drive.google.com/drive/folders/1s9XjcSiPC-FYV3VeHrEa7SeZetrthQVV?usp=drive_link).
-	- Cardiomyocyte dataset: 
+	- Cardiomyocyte dataset:
 		- Original data can be downloaded [here](https://singlecell.broadinstitute.org/single_cell/study/SCP1303/single-nuclei-profiling-of-human-dilated-and-hypertrophic-cardiomyopathy).
 		- We created a random 10% subset of the original dataset for our cell-level analysis, available at [this google drive folder](https://drive.google.com/drive/folders/1LgFvJqWNq9BqHbuxB2tYf62kXs9KqL4t?usp=share_link).
 	- Aorta dataset:
